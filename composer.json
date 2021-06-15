@@ -1,0 +1,23 @@
+{
+    "name": "bronsted/phporm",
+    "description": "A simple orm for php",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {"bronsted\\": ["src/"]},
+        "files": []
+    },
+    "autoload-dev": {
+        "psr-4": {"bronsted\\": ["test/"]}
+    },
+    "config": {
+        "platform": {
+            "php": "7.4"
+        }
+    },
+    "require": {
+    },
+    "require-dev": {
+        "fakerphp/faker": "^1.14",
+        "phpunit/phpunit": "^9.5"
+    }
+}
