@@ -8,6 +8,6 @@ class NotFoundException extends Exception
 {
     public function __construct(string $class)
     {
-        parent::__construct("Query for $class returned more than one object");
+        parent::__construct("$class not found");
     }
 }

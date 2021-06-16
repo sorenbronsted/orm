@@ -1,5 +1,5 @@
 {
-    "name": "bronsted/phporm",
+    "name": "bronsted/orm",
     "description": "A simple orm for php",
     "license": "MIT",
     "authors": [
