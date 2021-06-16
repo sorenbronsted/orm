@@ -174,15 +174,8 @@ trait Db
 
     protected function update(): void
     {
-        unset($this->_changed['uid']);
-        if (empty($this->_changed)) {
-            return;
-        }
-
-        $props = [];
-        foreach($this->_changed as $name) {
-            $props[$name] = $this->$name;
-        }
+        $props = self::properties();
+        unset($props['uid']);
         $list = self::buildSetList($props);
         $props['uid'] = $this->uid;
         $sql = "update " . self::table() . " set $list where uid = ?";

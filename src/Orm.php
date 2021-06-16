@@ -3,16 +3,11 @@
 namespace bronsted;
 
 use DateTime;
-use Exception;
-use Reflection;
 use ReflectionClass;
-use ReflectionProperty;
 
 trait Orm
 {
     use Db;
-
-    private array $_changed = [];
 
     public function __get($name)
     {
@@ -32,7 +27,6 @@ trait Orm
         else {
             $this->$name = $value;
         }
-        $this->_changed[] = $name;
     }
 
     public function properties(): array
@@ -56,7 +50,6 @@ trait Orm
         } else {
             $this->update();
         }
-        $this->_changed = [];
     }
 
     public function destroy(): void
@@ -82,7 +75,7 @@ trait Orm
      *  The result
      * @throws ConnectionException
      */
-    public static function getAll(array $orderby = array()): array
+    public static function getAll(array $orderby = array()): DbCursor
     {
         return self::get(array(), $orderby);
     }

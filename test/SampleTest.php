@@ -55,7 +55,7 @@ class SampleTest extends TestCase
 
     private function update(Sample $created)
     {
-        $created->name = 'hej';
+        $created->setHello();
         $created->created = new DateTime();
         $created->save();
 
