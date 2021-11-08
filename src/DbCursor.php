@@ -10,6 +10,7 @@ use PDOStatement;
 
 class DbCursor implements Countable, Iterator, ArrayAccess
 {
+    private $class = null;
     private $current = 0;
     private $stmt = null;
     private $objects = [];

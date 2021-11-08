@@ -23,7 +23,7 @@
     "require": {
     },
     "require-dev": {
-        "fakerphp/faker": "^1.14",
+        "fakerphp/faker": "^1.15",
         "phpunit/phpunit": "^9.5"
     }
 }
