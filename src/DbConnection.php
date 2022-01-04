@@ -2,69 +2,60 @@
 
 namespace bronsted;
 
-use Exception;
+use DateTime;
 use PDO;
-use stdClass;
+use PDOStatement;
+use RuntimeException;
 
-trait DbConnection
+class DbConnection
 {
-    protected static stdClass $_config;
-    protected static string $_dbname = 'default';
+    private PDO $connection;
 
-    private static $_connections = array();
-
-    public static function setConfig(stdClass $config)
+    public function __construct(PDO $connection)
     {
-        self::$_config = $config;
+        $this->connection = $connection;
+        $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $this->connection->setAttribute(PDO::ATTR_AUTOCOMMIT, 1);
     }
 
-    public static function getConnection(): PDO
+    public function execute(string $sql, ?array $values = []): ?int
     {
-        if (self::$_dbname == null) {
-            throw new Exception("dbname is missing");
-        }
-
-        if (isset(self::$_connections[self::$_dbname])) {
-            return self::$_connections[self::$_dbname];
-        }
-
-        if (self::$_config == null) {
-            throw new Exception("config is missing");
-        }
-
-        if (self::$_config->{self::$_dbname}->driver == null) {
-            throw new Exception("driver for " . self::$_dbname  . "is not found");
-        }
-
-        $dsn = self::dsn(self::$_dbname);
-        if (empty($dsn)) {
-            throw new Exception('dsn is empty');
-        }
-
-        $pdo = new PDO($dsn, self::$_config->{self::$_dbname}->user, self::$_config->{self::$_dbname}->password);
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        if (isset(self::$_config->{self::$_dbname}->schema)) {
-            $pdo->exec('set schema ' . self::$_config->{self::$_dbname}->schema);
-        }
-        self::$_connections[self::$_dbname] = $pdo;
-        return self::$_connections[self::$_dbname];
+        $this->doIt($sql, $values);
+        return $this->connection->lastInsertId();
     }
 
-    private static function dsn()
+    public function query(string $sql, ?array $qbe = []): PDOStatement
     {
-        $result = null;
-        switch (self::$_config->{self::$_dbname}->driver) {
-            case 'mysql':
-                $result = self::$_config->{self::$_dbname}->driver .
-                    ':host='    . self::$_config->{self::$_dbname}->host .
-                    ';dbname='  . self::$_config->{self::$_dbname}->name .
-                    ';charset=' . self::$_config->{self::$_dbname}->charset;
-                break;
-            case 'sqlite':
-                $result = self::$_config->{self::$_dbname}->driver .
-                    ':' . self::$_config->{self::$_dbname}->name;
-                break;
+        return $this->doIt($sql, $qbe);
+    }
+
+    private function doIt(string $sql, array $values): PDOStatement
+    {
+        $stmt = $this->connection->prepare($sql);
+        if ($stmt === false) {
+            throw new RuntimeException("prepare statement failed");
+        }
+        $values = $this->prepareValues($values);
+        $result = $stmt->execute($values);
+        if ($result === false) {
+            throw new RuntimeException("execute statement failed");
+        }
+        return $stmt;
+    }
+
+    private static function prepareValues(array $values): array
+    {
+        $result = [];
+        foreach($values as $name => $value) {
+            $test = is_a($value, DateTime::class);
+            if (is_a($value, DateTime::class)) {
+                $result[$name] = $value->format('Y-m-d H:i:s.u');
+            }
+            else {
+                $result[$name] = $value;
+            }
         }
         return $result;
     }
+
 }

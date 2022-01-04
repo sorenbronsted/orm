@@ -4,10 +4,10 @@ test:
 	vendor/bin/phpunit
 
 coverage:
-	vendor/bin/phpunit --coverage-text
+	export XDEBUG_MODE=coverage; vendor/bin/phpunit --coverage-text
 
 coverage-report:
-	vendor/bin/phpunit --coverage-html build
+	export XDEBUG_MODE=coverage; vendor/bin/phpunit --coverage-html build
 
 serve:
 	php -S localhost:8000 -t public

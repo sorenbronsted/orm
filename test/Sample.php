@@ -4,10 +4,8 @@ namespace bronsted;
 
 use DateTime;
 
-class Sample
+class Sample extends DbObject
 {
-    use Orm;
-
     protected int $uid = 0;
     protected ?string $name = null;
     protected ?DateTime $created = null;

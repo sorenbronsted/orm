@@ -22,7 +22,7 @@ class DbCursor implements Countable, Iterator, ArrayAccess
         $this->fetchObject();
     }
 
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return $this->valid();
     }
@@ -33,19 +33,19 @@ class DbCursor implements Countable, Iterator, ArrayAccess
         return $this->objects[$offset];
     }
 
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         $this->count(); // ensure all is loaded
         $this->objects[$offset] = $value;
     }
 
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         $this->count(); // ensure all is loaded
         unset($this->objects[$offset]);
     }
 
-    public function count()
+    public function count(): int
     {
         while ($this->valid()) {
             $this->next();
@@ -63,17 +63,17 @@ class DbCursor implements Countable, Iterator, ArrayAccess
         return $this->current;
     }
 
-    public function valid()
+    public function valid(): bool
     {
         return isset($this->objects[$this->current]);
     }
 
-    public function rewind()
+    public function rewind(): void
     {
         $this->current = 0;
     }
 
-    public function next()
+    public function next(): void
     {
         $this->fetchObject();
         $this->current += 1;

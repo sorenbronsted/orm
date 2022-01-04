@@ -3,28 +3,20 @@
 namespace bronsted;
 
 use DateTime;
+use PDO;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 
 class SampleTest extends TestCase
 {
     protected function setUp(): void
     {
         parent::setUp();
-        $sqlite = new stdClass();
-        $sqlite->driver = 'sqlite';
-        $sqlite->name = ':memory:';
-        $sqlite->user = '';
-        $sqlite->password = '';
 
-        $config = new stdClass();
-        $config->default = $sqlite;
-        Sample::setConfig($config);
-
-        $sql = "create table if not exists sample(uid integer primary key ".
-        "autoincrement,name varchar(64),created datetime)";
-        $con = Sample::getConnection();
-        $con->exec($sql);
+        $pdo = new PDO('sqlite::memory:');
+        $dbCon = new DbConnection($pdo);
+        Db::setConnection($dbCon);
+        $sql = "create table sample(uid integer primary key autoincrement, name varchar(64),created datetime)";
+        $dbCon->execute($sql);
     }
 
     public function testCrud()
@@ -67,7 +59,7 @@ class SampleTest extends TestCase
 
     private function delete(Sample $created)
     {
-        $created->destroy();
+        $created->delete();
         $this->expectException(NotFoundException::class);
         Sample::getByUid($created->uid);
     }
