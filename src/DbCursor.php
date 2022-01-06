@@ -24,7 +24,8 @@ class DbCursor implements Countable, Iterator, ArrayAccess
 
     public function offsetExists($offset): bool
     {
-        return $this->valid();
+        $this->count(); // ensure all is loaded
+        return isset($this->objects[$offset]);
     }
 
     public function offsetGet($offset)

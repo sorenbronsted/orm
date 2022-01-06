@@ -51,13 +51,13 @@ class DbObject
      * Get an object by uid
      * @param int $uid
      *  The uid to lookup
-     * @return object
+     * @return DbObject
      *  The result
      * @throws ConnectionException
      * @throws MoreThanOneException
      * @throws NotFoundException
      */
-    public static function getByUid(int $uid): object
+    public static function getByUid(int $uid): DbObject
     {
         return self::getOneBy(["uid" => $uid]);
     }
@@ -66,7 +66,7 @@ class DbObject
      * Get objects of this class
      * @param array $orderby
      *  The properties to order by
-     * @return array
+     * @return DbCursor
      *  The result
      * @throws ConnectionException
      */
@@ -102,10 +102,10 @@ class DbObject
      *  The result
      * @throws ConnectionException
      */
-    public static function getWhere(string $where, array $order = []): DbCursor
+    public static function getWhere(string $where, array $qbe = [], array $order = []): DbCursor
     {
         $sql = SqlBuilder::select(get_called_class(), $where, $order);
-        return self::getObjects($sql);
+        return self::getObjects($sql, $qbe);
     }
 
 
@@ -128,13 +128,13 @@ class DbObject
      * Get one object by matching all properties
      * @param array $where
      *  The properties and values to match
-     * @return object
+     * @return DbObject
      *  The reusult
      * @throws MoreThanOneException
      * @throws NotFoundException
      * @throws ConnectionException
      */
-    public static function getOneBy(array $where): object
+    public static function getOneBy(array $where): DbObject
     {
         $result = self::getBy($where);
         return self::verifyOne($result);
@@ -144,12 +144,12 @@ class DbObject
      * Verify that result only contains one object and return it if true
      * @param DbCursor $result
      * 	The object to test
-     * @return object
+     * @return DbObject
      * 	The object if only one
      * @throws MoreThanOneException
      * @throws NotFoundException
      */
-    public static function verifyOne(DbCursor $result): object
+    public static function verifyOne(DbCursor $result): DbObject
     {
         if (count($result) == 1) {
             return $result[0];
@@ -157,9 +157,7 @@ class DbObject
         if (count($result) > 1) {
             throw new MoreThanOneException(get_called_class());
         }
-        if (count($result) == 0) {
-            throw new NotFoundException(get_called_class());
-        }
+        throw new NotFoundException(get_called_class());
     }
 
     /**
