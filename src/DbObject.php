@@ -51,13 +51,13 @@ class DbObject
      * Get an object by uid
      * @param int $uid
      *  The uid to lookup
-     * @return DbObject
+     * @return object
      *  The result
      * @throws ConnectionException
      * @throws MoreThanOneException
      * @throws NotFoundException
      */
-    public static function getByUid(int $uid): DbObject
+    public static function getByUid(int $uid): object
     {
         return self::getOneBy(["uid" => $uid]);
     }
@@ -66,11 +66,11 @@ class DbObject
      * Get objects of this class
      * @param array $orderby
      *  The properties to order by
-     * @return DbCursor
+     * @return object
      *  The result
      * @throws ConnectionException
      */
-    public static function getAll(array $orderby = []): DbCursor
+    public static function getAll(array $orderby = []): object
     {
         return self::getBy([], $orderby);
     }
@@ -128,13 +128,13 @@ class DbObject
      * Get one object by matching all properties
      * @param array $where
      *  The properties and values to match
-     * @return DbObject
+     * @return object
      *  The reusult
      * @throws MoreThanOneException
      * @throws NotFoundException
      * @throws ConnectionException
      */
-    public static function getOneBy(array $where): DbObject
+    public static function getOneBy(array $where): object
     {
         $result = self::getBy($where);
         return self::verifyOne($result);
@@ -144,12 +144,12 @@ class DbObject
      * Verify that result only contains one object and return it if true
      * @param DbCursor $result
      * 	The object to test
-     * @return DbObject
+     * @return object
      * 	The object if only one
      * @throws MoreThanOneException
      * @throws NotFoundException
      */
-    public static function verifyOne(DbCursor $result): DbObject
+    public static function verifyOne(DbCursor $result): object
     {
         if (count($result) == 1) {
             return $result[0];

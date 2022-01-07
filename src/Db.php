@@ -2,9 +2,6 @@
 
 namespace bronsted;
 
-use DateTime;
-use RuntimeException;
-
 class Db
 {
     private static DbConnection $connection;
