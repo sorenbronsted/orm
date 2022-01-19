@@ -50,6 +50,43 @@ class SampleTest extends TestCase
         $this->assertEquals(0, count($samples));
     }
 
+    public function testQueryWithNull()
+    {
+        $sample = $this->create();
+        $samples = Sample::getBy(['name' => null]);
+        $this->assertEquals(0, count($samples));
+
+        $sample->name = null;
+        $sample->save();
+        $samples = Sample::getBy(['name' => null]);
+        $this->assertEquals(1, count($samples));
+    }
+
+    public function testQueryWithLike()
+    {
+        $sample = $this->create();
+        $samples = Sample::getBy(['name' => 'foo%']);
+        $this->assertEquals(0, count($samples));
+
+        $sample->name = 'foo bar';
+        $sample->save();
+        $samples = Sample::getBy(['name' => 'foo%']);
+        $this->assertEquals(1, count($samples));
+    }
+
+    public function testOrderBy()
+    {
+        // Create 2 samples
+        $this->create();
+        $this->create();
+
+        $samples = Sample::getAll(['uid']);
+        $this->assertTrue($samples[0]->uid < $samples[1]->uid);
+
+        $samples = Sample::getAll(['desc', 'uid']);
+        $this->assertTrue($samples[0]->uid > $samples[1]->uid);
+    }
+
     public function testMoreThanOneException()
     {
         $this->create();

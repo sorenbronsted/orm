@@ -30,7 +30,14 @@ class SqlBuilder
             $select .= ' where ' . $where;
         }
         if (!empty($order)) {
-            $select .= ' order by ' . implode(',', $order);
+            $direction = strtolower($order[0]);
+            if (in_array($direction, ['asc', 'desc'])) {
+                array_shift($order);
+            }
+            else {
+                $direction = 'asc';
+            }
+            $select .= ' order by ' . implode(',', $order) . ' ' . $direction;
         }
         return $select;
     }
@@ -74,7 +81,7 @@ class SqlBuilder
         $assigments = [];
         foreach ($properties as $name => $value) {
             if (is_null($value)) {
-                $assigments[] = $name . ' is null ';
+                $assigments[] = $name . ' is :' . $name;
             } else if (is_string($value) && strpos($value, '%') >= 0) {
                 $assigments[] = $name . ' like :' . $name;
             } else {
