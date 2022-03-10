@@ -15,15 +15,16 @@
     "autoload-dev": {
         "psr-4": {"bronsted\\": ["test/"]}
     },
-    "config": {
-        "platform": {
-            "php": "7.4"
-        }
-    },
     "require": {
+        "php": "^7.4 || ~8.0",
+        "ext-pdo": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.15",
         "phpunit/phpunit": "^9.5"
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "coverage": "export XDEBUG_MODE=coverage; vendor/bin/phpunit --coverage-text"
     }
 }

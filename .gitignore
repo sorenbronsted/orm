@@ -1,4 +1,7 @@
 vendor
 build
 .vscode
+.idea
 .phpunit.result.cache
+.phpunit.cache
+.vagrant
