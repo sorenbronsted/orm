@@ -28,7 +28,7 @@ class DbCursor implements Countable, Iterator, ArrayAccess
         return isset($this->objects[$offset]);
     }
 
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         $this->count(); // ensure all is loaded
         return $this->objects[$offset];
@@ -54,12 +54,12 @@ class DbCursor implements Countable, Iterator, ArrayAccess
         return count($this->objects);
     }
 
-    public function current()
+    public function current(): mixed
     {
         return $this->valid() ? $this->objects[$this->current] : false;
     }
 
-    public function key()
+    public function key(): int
     {
         return $this->current;
     }

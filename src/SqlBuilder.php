@@ -7,7 +7,7 @@ class SqlBuilder
     public static function getTableName($cls): string
     {
         $parts = explode('\\', $cls);
-        return strtolower($parts[1]);
+        return strtolower($parts[count($parts) - 1]);
     }
 
     public static function insert(string $cls, array $propertyNames): string
