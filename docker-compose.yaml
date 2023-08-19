@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  mariadb:
+    image: mariadb:10
+    restart: unless-stopped
+    ports:
+      - 3306:3306
+    volumes:
+      - ./store/mariadb:/var/lib/mysql
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+
+  orm:
+    image: orm
+    volumes:
+      - ./:/app
+    #depends_on: mariadb

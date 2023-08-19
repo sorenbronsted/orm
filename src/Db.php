@@ -4,11 +4,15 @@ namespace bronsted;
 
 class Db
 {
+    const DateTimeFmtSqlite = 'Y-m-d H:i:s.u';
+    const DateTimeFmtMysql = 'Y-m-d H:i:s';
     private static DbConnection $connection;
+    public static string $fmtDateTime;
 
-    public static function setConnection(DbConnection $connection)
+    public static function setConnection(DbConnection $connection, string $fmtDateTime)
     {
         self::$connection = $connection;
+        self::$fmtDateTime = $fmtDateTime;
     }
 
     public static function getConnection(): DbConnection

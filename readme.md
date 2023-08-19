@@ -11,7 +11,7 @@ you can use typed properties.
 ## Installation
 This package can be installed with [Composer](https://getcomposer.org/)
 
-    `composer install bronsted\fiberloop`
+    `composer install bronsted\orm`
 
 ## Example
 

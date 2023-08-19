@@ -3,16 +3,26 @@
 namespace bronsted;
 
 use DateTime;
+use JsonSerializable;
 use ReflectionClass;
 use ReflectionException;
 
-class DbObject
+class DbObject implements JsonSerializable
 {
     protected int $uid;
 
-    public function __construct()
+    public function __construct(mixed $data = null)
     {
         $this->uid = 0;
+        if ($data != null) {
+            if (is_array($data)) {
+                $data = (object)$data;
+            }
+            if (isset($data->uid)) {
+                $this->uid = $data->uid;
+            }
+            $this->populate($data);
+        }
     }
 
     /**
@@ -182,10 +192,8 @@ class DbObject
      */
     public function __set($name, $value)
     {
-        $reflection = new ReflectionClass($this);
-        $type = $reflection->getProperty($name)->getType();
-        if ($type->getName() == DateTime::class && is_string($value)) {
-            $this->$name = DateTime::createFromFormat('Y-m-d H:i:s.u', $value);
+        if ($this->getType($name) == DateTime::class && is_string($value)) {
+            $this->$name = DateTime::createFromFormat(Db::$fmtDateTime, $value);
         }
         else {
             $this->$name = $value;
@@ -202,7 +210,53 @@ class DbObject
         $names = array_keys(get_class_vars(get_class($this)));
         foreach($names as $name) {
             $result[$name] = $this->$name;
+            /*
+            if ($this->getType($name) == DateTime::class) {
+                $result[$name] = $this->$name->format(Db::$fmtDateTime);
+            }
+            else {
+                $result[$name] = $this->$name;
+            }
+            */
         }
         return $result;
+    }
+
+    /**
+     * Populate the properties of this object with values from data
+     * @param object $data
+     * @return void
+     */
+    public function populate(object $data): void
+    {
+        $names = array_filter(array_keys(get_class_vars(get_class($this))), function($element) {
+            return $element != 'uid';
+        });
+        foreach ($names as $name) {
+            if (isset($data->$name)) {
+                $this->__set($name, $data->$name);
+            }
+        }
+    }
+
+    /**
+     * Implements JsonSerializable with this objects properties and adds property class with the name of
+     * class name of the object.
+     * @return mixed
+     */
+    public function jsonSerialize(): mixed
+    {
+        return array_merge($this->getProperties(), ['class' => get_class($this)]);
+    }
+
+    /**
+     * Get type information for a property
+     * @param string $property
+     * @return string
+     * @throws ReflectionException
+     */
+    public function getType(string $property): string
+    {
+        return (new ReflectionClass($this))->getProperty($property)->getType()->getName();
     }
 }

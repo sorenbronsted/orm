@@ -86,10 +86,7 @@ class DbCursor implements Countable, Iterator, ArrayAccess
         if (!$row) {
             return;
         }
-        $object = new $this->class();
-        foreach ($row as $name => $value) {
-            $object->$name = $value;
-        }
+        $object = new $this->class((object)$row);
         $this->objects[] = $object;
     }
 }

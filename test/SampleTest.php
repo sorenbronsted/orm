@@ -12,9 +12,16 @@ class SampleTest extends TestCase
     {
         parent::setUp();
 
+        //mysql:  create table sample(uid int auto_increment, name varchar(64),created datetime, primary key(uid));
+        /*
+        $pdo = new PDO("mysql:host=web.bronsted.lan;dbname=orm;charset=UTF8", 'root', 'root');
+        $dbCon = new DbConnection($pdo);
+        Db::setConnection($dbCon, Db::DateTimeFmtMysql);
+        $dbCon->execute("truncate sample");
+        */
         $pdo = new PDO('sqlite::memory:');
         $dbCon = new DbConnection($pdo);
-        Db::setConnection($dbCon);
+        Db::setConnection($dbCon, Db::DateTimeFmtSqlite);
         $sql = "create table sample(uid integer primary key autoincrement, name varchar(64),created datetime)";
         $dbCon->execute($sql);
     }
@@ -142,7 +149,7 @@ class SampleTest extends TestCase
         $read = Sample::getByUid($created->uid);
         $this->assertEquals($created->uid, $read->uid);
         $this->assertEquals($created->name, $read->name);
-        $this->assertEquals($created->created, $read->created);
+        $this->assertEquals($created->created->format(Db::$fmtDateTime), $read->created->format(Db::$fmtDateTime));
     }
 
     private function update(Sample $created)
@@ -154,7 +161,7 @@ class SampleTest extends TestCase
         $read = Sample::getByUid($created->uid);
         $this->assertEquals($created->uid, $read->uid);
         $this->assertEquals($created->name, $read->name);
-        $this->assertEquals($created->created, $read->created);
+        $this->assertEquals($created->created->format(Db::$fmtDateTime), $read->created->format(Db::$fmtDateTime));
     }
 
     private function delete(Sample $created)
