@@ -264,7 +264,7 @@ class DbObject implements JsonSerializable
      * Begin a transaction
      * @return void
      */
-    public function begin(): void
+    public static function begin(): void
     {
         Db::begin();
     }
@@ -273,7 +273,7 @@ class DbObject implements JsonSerializable
      * Commit current transaction
      * @return void
      */
-    public function commit(): void
+    public static function commit(): void
     {
         Db::commit();
     }
@@ -282,7 +282,7 @@ class DbObject implements JsonSerializable
      * Rollback current transaction
      * @return void
      */
-    public function rollback(): void
+    public static function rollback(): void
     {
         Db::rollback();
     }

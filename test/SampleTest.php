@@ -12,20 +12,21 @@ class SampleTest extends TestCase
     {
         parent::setUp();
 
-
+        $test = 'sqlite';
         //mysql:  create table sample(uid int auto_increment, name varchar(64),created datetime, primary key(uid));
-        /*
-        $pdo = new PDO("mysql:host=web.bronsted.lan;dbname=orm;charset=UTF8", 'root', 'root');
-        $dbCon = new DbConnection($pdo, DbConnection::DateTimeFmtMysql);
-        Db::setConnection($dbCon);
-        $dbCon->execute("truncate sample");
-        */
-
-        $pdo = new PDO('sqlite::memory:');
-        $dbCon = new DbConnection($pdo, DbConnection::DateTimeFmtSqlite);
-        Db::setConnection($dbCon);
-        $sql = "create table sample(uid integer primary key autoincrement, name varchar(64),created datetime)";
-        $dbCon->execute($sql);
+        if ($test == 'mysql') {
+            $pdo = new PDO("mysql:host=web.bronsted.lan;dbname=orm;charset=UTF8", 'root', 'root');
+            $dbCon = new DbConnection($pdo, DbConnection::DateTimeFmtMysql);
+            Db::setConnection($dbCon);
+            $dbCon->execute("truncate sample");
+        }
+        else {
+            $pdo = new PDO('sqlite::memory:');
+            $dbCon = new DbConnection($pdo, DbConnection::DateTimeFmtSqlite);
+            Db::setConnection($dbCon);
+            $sql = "create table sample(uid integer primary key autoincrement, name varchar(64),created datetime)";
+            $dbCon->execute($sql);
+        }
     }
 
     public function testCrud()
@@ -139,9 +140,9 @@ class SampleTest extends TestCase
     public function testCommit()
     {
         $sample = new Sample();
-        $sample->begin();
+        $sample::begin();
         $sample->save();
-        $sample->commit();
+        $sample::commit();
         $samples = Sample::getAll();
         $this->assertEquals(1, count($samples));
     }
@@ -149,9 +150,9 @@ class SampleTest extends TestCase
     public function testRollback()
     {
         $sample = new Sample();
-        $sample->begin();
+        $sample::begin();
         $sample->save();
-        $sample->rollback();
+        $sample::rollback();
         $samples = Sample::getAll();
         $this->assertEquals(0, count($samples));
     }
