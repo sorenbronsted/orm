@@ -12,16 +12,18 @@ class SampleTest extends TestCase
     {
         parent::setUp();
 
+
         //mysql:  create table sample(uid int auto_increment, name varchar(64),created datetime, primary key(uid));
         /*
         $pdo = new PDO("mysql:host=web.bronsted.lan;dbname=orm;charset=UTF8", 'root', 'root');
-        $dbCon = new DbConnection($pdo);
-        Db::setConnection($dbCon, Db::DateTimeFmtMysql);
+        $dbCon = new DbConnection($pdo, DbConnection::DateTimeFmtMysql);
+        Db::setConnection($dbCon);
         $dbCon->execute("truncate sample");
         */
+
         $pdo = new PDO('sqlite::memory:');
-        $dbCon = new DbConnection($pdo);
-        Db::setConnection($dbCon, Db::DateTimeFmtSqlite);
+        $dbCon = new DbConnection($pdo, DbConnection::DateTimeFmtSqlite);
+        Db::setConnection($dbCon);
         $sql = "create table sample(uid integer primary key autoincrement, name varchar(64),created datetime)";
         $dbCon->execute($sql);
     }
@@ -134,6 +136,26 @@ class SampleTest extends TestCase
         $this->assertEquals(0, $samples->key());
     }
 
+    public function testCommit()
+    {
+        $sample = new Sample();
+        $sample->begin();
+        $sample->save();
+        $sample->commit();
+        $samples = Sample::getAll();
+        $this->assertEquals(1, count($samples));
+    }
+
+    public function testRollback()
+    {
+        $sample = new Sample();
+        $sample->begin();
+        $sample->save();
+        $sample->rollback();
+        $samples = Sample::getAll();
+        $this->assertEquals(0, count($samples));
+    }
+
     private function create(): Sample
     {
         $sample = new Sample();
@@ -149,7 +171,7 @@ class SampleTest extends TestCase
         $read = Sample::getByUid($created->uid);
         $this->assertEquals($created->uid, $read->uid);
         $this->assertEquals($created->name, $read->name);
-        $this->assertEquals($created->created->format(Db::$fmtDateTime), $read->created->format(Db::$fmtDateTime));
+        $this->assertEquals($created->created->format(Db::getDateTimeFormat()), $read->created->format(Db::getDateTimeFormat()));
     }
 
     private function update(Sample $created)
@@ -161,7 +183,7 @@ class SampleTest extends TestCase
         $read = Sample::getByUid($created->uid);
         $this->assertEquals($created->uid, $read->uid);
         $this->assertEquals($created->name, $read->name);
-        $this->assertEquals($created->created->format(Db::$fmtDateTime), $read->created->format(Db::$fmtDateTime));
+        $this->assertEquals($created->created->format(Db::getDateTimeFormat()), $read->created->format(Db::getDateTimeFormat()));
     }
 
     private function delete(Sample $created)

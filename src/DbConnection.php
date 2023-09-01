@@ -3,6 +3,7 @@
 namespace bronsted;
 
 use DateTime;
+use Exception;
 use PDO;
 use PDOStatement;
 use RuntimeException;
@@ -10,11 +11,46 @@ use RuntimeException;
 class DbConnection
 {
     private PDO $connection;
+    const DateTimeFmtSqlite = 'Y-m-d H:i:s.u';
+    const DateTimeFmtMysql = 'Y-m-d H:i:s';
+    private string $fmtDateTime;
 
-    public function __construct(PDO $connection)
+    public function __construct(PDO $connection, string $dateTimeFormat)
     {
         $this->connection = $connection;
+        $this->fmtDateTime = $dateTimeFormat;
         $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $this->connection->setAttribute(PDO::ATTR_AUTOCOMMIT, 1);
+    }
+
+    public function getDateTimeFormat(): string
+    {
+        return $this->fmtDateTime;
+    }
+
+    public function begin()
+    {
+        $ok = $this->connection->beginTransaction();
+        if (!$ok) {
+            throw new Exception('Begin transaction failed');
+        }
+    }
+
+    public function commit()
+    {
+        $ok = $this->connection->commit();
+        if (!$ok) {
+            throw new Exception('Commit transaction failed');
+        }
+        $this->connection->setAttribute(PDO::ATTR_AUTOCOMMIT, 1);
+    }
+
+    public function rollback()
+    {
+        $ok = $this->connection->rollBack();
+        if (!$ok) {
+            throw new Exception('Rollback transaction failed');
+        }
         $this->connection->setAttribute(PDO::ATTR_AUTOCOMMIT, 1);
     }
 
@@ -43,13 +79,12 @@ class DbConnection
         return $stmt;
     }
 
-    private static function prepareValues(array $values): array
+    private function prepareValues(array $values): array
     {
         $result = [];
         foreach($values as $name => $value) {
-            $test = is_a($value, DateTime::class);
             if (is_a($value, DateTime::class)) {
-                $result[$name] = $value->format('Y-m-d H:i:s.u');
+                $result[$name] = $value->format($this->fmtDateTime);
             }
             else {
                 $result[$name] = $value;

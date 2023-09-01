@@ -193,7 +193,7 @@ class DbObject implements JsonSerializable
     public function __set($name, $value)
     {
         if ($this->getType($name) == DateTime::class && is_string($value)) {
-            $this->$name = DateTime::createFromFormat(Db::$fmtDateTime, $value);
+            $this->$name = DateTime::createFromFormat(Db::getDateTimeFormat(), $value);
         }
         else {
             $this->$name = $value;
@@ -258,5 +258,32 @@ class DbObject implements JsonSerializable
     public function getType(string $property): string
     {
         return (new ReflectionClass($this))->getProperty($property)->getType()->getName();
+    }
+
+    /**
+     * Begin a transaction
+     * @return void
+     */
+    public function begin(): void
+    {
+        Db::begin();
+    }
+
+    /**
+     * Commit current transaction
+     * @return void
+     */
+    public function commit(): void
+    {
+        Db::commit();
+    }
+
+    /**
+     * Rollback current transaction
+     * @return void
+     */
+    public function rollback(): void
+    {
+        Db::rollback();
     }
 }

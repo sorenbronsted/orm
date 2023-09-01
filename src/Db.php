@@ -4,15 +4,11 @@ namespace bronsted;
 
 class Db
 {
-    const DateTimeFmtSqlite = 'Y-m-d H:i:s.u';
-    const DateTimeFmtMysql = 'Y-m-d H:i:s';
     private static DbConnection $connection;
-    public static string $fmtDateTime;
 
-    public static function setConnection(DbConnection $connection, string $fmtDateTime)
+    public static function setConnection(DbConnection $connection)
     {
         self::$connection = $connection;
-        self::$fmtDateTime = $fmtDateTime;
     }
 
     public static function getConnection(): DbConnection
@@ -21,6 +17,26 @@ class Db
             throw new ConfigException();
         }
         return self::$connection;
+    }
+
+    public static function begin()
+    {
+        self::getConnection()->begin();
+    }
+
+    public static function commit()
+    {
+        self::getConnection()->commit();
+    }
+
+    public static function rollback()
+    {
+        self::getConnection()->rollback();
+    }
+
+    public static function getDateTimeFormat(): string
+    {
+        return self::getConnection()->getDateTimeFormat();
     }
 
     public static function select(string $cls, string $select, array $qbe = []): DbCursor
