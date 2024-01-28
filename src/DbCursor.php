@@ -5,10 +5,11 @@ namespace bronsted;
 use ArrayAccess;
 use Countable;
 use Iterator;
+use JsonSerializable;
 use PDO;
 use PDOStatement;
 
-class DbCursor implements Countable, Iterator, ArrayAccess
+class DbCursor implements Countable, Iterator, ArrayAccess, JsonSerializable
 {
     private $class = null;
     private $current = 0;
@@ -78,6 +79,18 @@ class DbCursor implements Countable, Iterator, ArrayAccess
     {
         $this->fetchObject();
         $this->current += 1;
+    }
+
+
+    public function jsonSerialize(): mixed
+    {
+        $result = [];
+        $this->rewind();
+        while ($this->valid()) {
+            $result[] = $this->current();
+            $this->next();
+        }
+        return $result;
     }
 
     private function fetchObject()
