@@ -129,7 +129,7 @@ class DbObject implements JsonSerializable
      * 	The result
      * @throws ConnectionException
      */
-    public static function getObjects(string $sql, array $qbe = null): DbCursor
+    public static function getObjects(string $sql, ?array $qbe = null): DbCursor
     {
         return Db::select(get_called_class(), $sql, $qbe);
     }
